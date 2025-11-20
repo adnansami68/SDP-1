@@ -11,10 +11,9 @@
 
 using namespace std;
 
-// Constants
-const string ACCOUNT_FILE = "bank_accounts.dat";
-const string TRANSACTION_LOG = "bank_transactions.log";
-const string COUNTER_FILE = "account_counter.dat";
+const string ACCOUNT_FILE = "bank_accounts.txt";
+const string TRANSACTION_LOG = "bank_transactions.txt";
+const string COUNTER_FILE = "account_counter.txt";
 const int MIN_PASSWORD_LENGTH = 4;
 const double SAVINGS_MIN_BALANCE = 100.0;
 const double CURRENT_MIN_BALANCE = 500.0;
@@ -32,19 +31,18 @@ private:
     vector<string> transactionHistory;
 
 public:
-    // Constructor
-    BankAccount(string accNum = "", string name = "", string addr = "",
-                string phone = "", string mail = "", double initialDeposit = 0.0,
+    BankAccount(string accNum = "", string name = "", string addr = "", 
+                string phone = "", string mail = "", double initialDeposit = 0.0, 
                 string type = "Savings", string pwd = "1234")
-        : accountNumber(accNum), accountHolderName(name), address(addr),
-          phoneNumber(phone), email(mail), balance(initialDeposit),
+        : accountNumber(accNum), accountHolderName(name), address(addr), 
+          phoneNumber(phone), email(mail), balance(initialDeposit), 
           accountType(type), password(pwd) {
         if (initialDeposit > 0) {
             addTransaction("Account opened with initial deposit: " + to_string(initialDeposit) + " BDT");
         }
     }
 
-    // Getters
+
     string getAccountNumber() const { return accountNumber; }
     string getAccountHolderName() const { return accountHolderName; }
     double getBalance() const { return balance; }
@@ -52,7 +50,6 @@ public:
     string getPassword() const { return password; }
     const vector<string>& getTransactionHistory() const { return transactionHistory; }
 
-    // Account operations
     void deposit(double amount) {
         if (amount > 0) {
             balance += amount;
@@ -79,7 +76,7 @@ public:
         }
 
         double minBalance = (accountType == "Savings") ? SAVINGS_MIN_BALANCE : CURRENT_MIN_BALANCE;
-
+        
         if (balance - amount < minBalance) {
             cout << "Withdrawal failed. Minimum balance requirement not met." << endl;
             cout << "Minimum required balance for " << accountType << " account: " << minBalance << " BDT" << endl;
@@ -116,7 +113,6 @@ public:
         cout << "===========================\n" << endl;
     }
 
-    // Method to save account to file
     void saveToFile(ofstream& outFile) const {
         outFile << accountNumber << endl;
         outFile << accountHolderName << endl;
@@ -126,15 +122,14 @@ public:
         outFile << fixed << setprecision(2) << balance << endl;
         outFile << accountType << endl;
         outFile << password << endl;
-
-        // Save transaction history
+        
         outFile << transactionHistory.size() << endl;
         for (const auto& transaction : transactionHistory) {
             outFile << transaction << endl;
         }
     }
 
-    // Method to load account from file
+
     void loadFromFile(ifstream& inFile) {
         getline(inFile, accountNumber);
         getline(inFile, accountHolderName);
@@ -145,8 +140,7 @@ public:
         inFile.ignore();
         getline(inFile, accountType);
         getline(inFile, password);
-
-        // Load transaction history
+    
         int transactionCount;
         inFile >> transactionCount;
         inFile.ignore();
@@ -170,13 +164,11 @@ private:
 class BankingSystem {
 private:
     vector<BankAccount> accounts;
-    int accountCounter = 1000; // Starting from ACCT1001
-
+    int accountCounter = 1000;
     string generateAccountNumber() {
         accountCounter++;
         return "ACCT" + to_string(accountCounter);
     }
-
     void loadAccountCounter() {
         ifstream inFile(COUNTER_FILE);
         if (inFile) {
@@ -184,7 +176,6 @@ private:
             inFile.close();
         }
     }
-
     void saveAccountCounter() {
         ofstream outFile(COUNTER_FILE);
         if (outFile) {
@@ -209,9 +200,8 @@ private:
                 BankAccount account;
                 account.loadFromFile(inFile);
                 accounts.push_back(account);
-
-                // Update counter to highest account number
-                string accNum = account.getAccountNumber().substr(4); // Remove "ACCT"
+                
+                string accNum = account.getAccountNumber().substr(4);
                 int num = stoi(accNum);
                 if (num >= accountCounter) {
                     accountCounter = num;
@@ -254,7 +244,7 @@ private:
         string input;
         char ch;
         while ((ch = getchar()) != '\n') {
-            if (ch == '\b') { // Handle backspace
+            if (ch == '\b') { 
                 if (!input.empty()) {
                     input.pop_back();
                     cout << "\b \b";
@@ -311,7 +301,6 @@ public:
             cout << "Phone number must contain only digits. Please try again." << endl;
         }
 
-        // Email validation (simple check)
         while (true) {
             cout << "Enter email: ";
             getline(cin, email);
@@ -319,7 +308,6 @@ public:
             cout << "Invalid email format. Please try again." << endl;
         }
 
-        // Account type validation
         while (true) {
             cout << "Enter account type (Savings/Current): ";
             getline(cin, accountType);
@@ -329,7 +317,6 @@ public:
             cout << "Invalid account type. Please enter 'Savings' or 'Current'." << endl;
         }
 
-        // Initial deposit validation
         double minDeposit = (accountType == "Savings") ? SAVINGS_MIN_BALANCE : CURRENT_MIN_BALANCE;
         while (true) {
             cout << "Enter initial deposit amount (minimum " << minDeposit << " BDT): ";
@@ -346,7 +333,6 @@ public:
             }
         }
 
-        // Password validation
         cout << "Set a " << MIN_PASSWORD_LENGTH << "-digit password for withdrawals: ";
         password = getHiddenInput();
         while (password.length() != MIN_PASSWORD_LENGTH || !all_of(password.begin(), password.end(), ::isdigit)) {
@@ -382,7 +368,7 @@ public:
         if (account) {
             cout << "Account holder: " << account->getAccountHolderName() << endl;
             cout << "Current balance: " << fixed << setprecision(2) << account->getBalance() << " BDT" << endl;
-
+            
             while (true) {
                 cout << "Enter deposit amount: ";
                 if (cin >> amount) {
@@ -414,7 +400,7 @@ public:
         if (account) {
             cout << "Account holder: " << account->getAccountHolderName() << endl;
             cout << "Current balance: " << fixed << setprecision(2) << account->getBalance() << " BDT" << endl;
-
+            
             cout << "Enter your " << MIN_PASSWORD_LENGTH << "-digit password: ";
             cin.ignore();
             password = getHiddenInput();
@@ -492,18 +478,27 @@ public:
 
     void displayAllAccounts() {
         clearScreen();
-        cout << "\n=== All Accounts ===" << endl;
-        if (accounts.empty()) {
-            cout << "No accounts found." << endl;
-        } else {
-            for (const auto& account : accounts) {
-                cout << "Account Number: " << account.getAccountNumber()
-                     << " | Holder: " << account.getAccountHolderName()
-                     << " | Type: " << account.getAccountType()
-                     << " | Balance: " << fixed << setprecision(2) << account.getBalance() << " BDT" << endl;
+        cout<<"Enter Admin Password:";
+        string admin_pass;
+        cin>>admin_pass;
+        if(admin_pass=="2255"){
+            cout << "\n=== All Accounts ===" << endl;
+            if (accounts.empty()) {
+                cout << "No accounts found." << endl;
+            } else {
+                for (const auto& account : accounts) {
+                    cout << "Account Number: " << account.getAccountNumber() 
+                            << " | Holder: " << account.getAccountHolderName()
+                            << " | Type: " << account.getAccountType()
+                            << " | Balance: " << fixed << setprecision(2) << account.getBalance() << " BDT" << endl;
+                }
             }
+            cout << "=====================\n" << endl;
         }
-        cout << "=====================\n" << endl;
+        else{
+            cout<<"\nInvalid Pass"<<endl;
+            return;
+        }
     }
 };
 
@@ -529,7 +524,7 @@ int main() {
 
     while (true) {
         displayMenu();
-
+        
         if (!(cin >> choice)) {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
